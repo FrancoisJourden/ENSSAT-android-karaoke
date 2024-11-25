@@ -1,6 +1,5 @@
-package fr.singwithme.BarbotaudJourden.ui.theme
+package fr.singwithme.barbotaudJourden.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
