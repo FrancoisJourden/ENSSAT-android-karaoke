@@ -48,7 +48,7 @@ class MusicListActivity : ComponentActivity() {
                 val response = withContext(Dispatchers.IO) {
                     MusicApi.retrofitService.getMusics().awaitResponse()
                 }
-                if(!response.isSuccessful){
+                if (!response.isSuccessful) {
                     onResult(MusicListState.Error("Error: ${response.code()}"))
                     return@launch
                 }
@@ -100,7 +100,8 @@ fun MusicList(modifier: Modifier = Modifier) {
             LazyColumn(modifier = modifier) {
                 items(musics.size) { i ->
                     MusicListItem(musics[i])
-                    HorizontalDivider()
+                    if (i < musics.size - 1)
+                        HorizontalDivider()
 
                 }
             }
@@ -117,27 +118,28 @@ fun MusicList(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MusicListItem(music: MusicListModel, modifier: Modifier = Modifier){
+fun MusicListItem(music: MusicListModel, modifier: Modifier = Modifier) {
     ListItem(
         modifier = modifier
             .clickable {
-                if(music.locked == true) return@clickable
+                if (music.locked == true) return@clickable
                 // TODO: open music
             }
             .animateContentSize(),
         headlineContent = { Text(music.name) },
         supportingContent = { Text(music.artist) },
-        trailingContent = { if(music.locked == true) Icon(
-            imageVector = Icons.Default.Lock,
-            contentDescription = "Locked"
-        )
+        trailingContent = {
+            if (music.locked == true) Icon(
+                imageVector = Icons.Default.Lock,
+                contentDescription = "Locked"
+            )
         }
     )
 }
 
 @Preview
 @Composable
-fun PreviewMusicListItem(){
+fun PreviewMusicListItem() {
     MusicListItem(
         music = MusicListModel(
             name = "Music",
@@ -150,7 +152,7 @@ fun PreviewMusicListItem(){
 
 @Preview
 @Composable
-fun PreviewMusicListItemLocked(){
+fun PreviewMusicListItemLocked() {
     MusicListItem(
         music = MusicListModel(
             name = "Music",
