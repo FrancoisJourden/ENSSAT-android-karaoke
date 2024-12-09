@@ -25,6 +25,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="fr.singwithme.barbotaudJourden.RenderMusicActivity"
+            android:label="render_music"
+            android:theme="@style/Theme.SingWithMe">
+        </activity>
     </application>
 
 </manifest>

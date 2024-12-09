@@ -1,5 +1,6 @@
 package fr.singwithme.barbotaudJourden
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -46,7 +47,7 @@ class MusicListActivity : ComponentActivity() {
         lifecycleScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
-                    MusicApi.retrofitService.getMusics().awaitResponse()
+                    MusicListApi.retrofitService.getMusics().awaitResponse()
                 }
                 if (!response.isSuccessful) {
                     onResult(MusicListState.Error("Error: ${response.code()}"))
@@ -99,7 +100,11 @@ fun MusicList(modifier: Modifier = Modifier) {
             val musics = state.musics
             LazyColumn(modifier = modifier) {
                 items(musics.size) { i ->
-                    MusicListItem(musics[i])
+                    MusicListItem(musics[i], onClick = {
+                        val intent= Intent(activity, RenderMusicActivity::class.java)
+                        intent.putExtra("path", musics[i].path)
+                        activity.startActivity(intent)
+                    })
                     if (i < musics.size - 1)
                         HorizontalDivider()
 
@@ -118,12 +123,12 @@ fun MusicList(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MusicListItem(music: MusicListModel, modifier: Modifier = Modifier) {
+fun MusicListItem(music: MusicListModel, modifier: Modifier = Modifier, onClick: () -> Unit) {
     ListItem(
         modifier = modifier
             .clickable {
                 if (music.locked == true) return@clickable
-                // TODO: open music
+                onClick()
             }
             .animateContentSize(),
         headlineContent = { Text(music.name) },
@@ -146,7 +151,8 @@ fun PreviewMusicListItem() {
             artist = "Artist",
             locked = false,
             path = null
-        )
+        ),
+        onClick = {}
     )
 }
 
@@ -159,6 +165,7 @@ fun PreviewMusicListItemLocked() {
             artist = "Artist",
             locked = true,
             path = null
-        )
+        ),
+        onClick = {}
     )
 }
