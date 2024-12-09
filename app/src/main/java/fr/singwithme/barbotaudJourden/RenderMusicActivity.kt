@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
-import fr.singwithme.BarbotaudJourden.ui.theme.SingWithMeTheme
+import fr.singwithme.barbotaudJourden.ui.theme.SingWithMeTheme
 import androidx.compose.ui.unit.dp
 
 
