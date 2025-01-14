@@ -10,6 +10,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -38,20 +39,27 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
+import fr.singwithme.barbotaudJourden.model.LyricModel
 import fr.singwithme.barbotaudJourden.model.MusicModel
 import fr.singwithme.barbotaudJourden.ui.theme.SingWithMeTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.awaitResponse
+import kotlin.time.Duration
 
-sealed class MusicDetailsState{
-    data class Success(val music: MusicModel): MusicDetailsState()
-    object Loading: MusicDetailsState()
-    data class Error(val message: String): MusicDetailsState()
+sealed class MusicDetailsState {
+    data class Success(val music: MusicModel) : MusicDetailsState()
+    object Loading : MusicDetailsState()
+    data class Error(val message: String) : MusicDetailsState()
 }
 
 class RenderMusicActivity : ComponentActivity() {
+    public var player: ExoPlayer? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -70,19 +78,24 @@ class RenderMusicActivity : ComponentActivity() {
         }
     }
 
-    fun getMusic(path: String, onResult: (MusicDetailsState) -> Unit){
-        lifecycleScope.launch{
-            try{
-                val response = withContext(Dispatchers.IO){
+    override fun onDestroy() {
+        super.onDestroy()
+        player?.release()
+    }
+
+    fun getMusic(path: String, onResult: (MusicDetailsState) -> Unit) {
+        lifecycleScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
                     MusicDetailApi.retrofitService.getMusic(path).awaitResponse()
                 }
-                if(!response.isSuccessful){
+                if (!response.isSuccessful) {
                     onResult(MusicDetailsState.Error("Error: ${response.code()}"))
                     return@launch
                 }
                 val music = response.body()!!
                 onResult(MusicDetailsState.Success(music))
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 onResult(MusicDetailsState.Error(e.message.toString()))
             }
         }
@@ -93,7 +106,7 @@ class RenderMusicActivity : ComponentActivity() {
 fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
 
 @Composable
-fun Body(modifier: Modifier = Modifier, path: String){
+fun Body(modifier: Modifier = Modifier, path: String) {
     var musicDetailsState by remember { mutableStateOf<MusicDetailsState>(MusicDetailsState.Loading) }
     val activity = LocalContext.current as RenderMusicActivity
     LaunchedEffect(Unit) {
@@ -102,17 +115,38 @@ fun Body(modifier: Modifier = Modifier, path: String){
         }
     }
 
-    when (val state = musicDetailsState){
+    when (val state = musicDetailsState) {
         is MusicDetailsState.Success -> {
             val music = state.music
-            KaraokeTextAnimate(
-                music.lyrics.map { it.duration.inWholeMilliseconds.toInt() },
-                music.lyrics.map { it.text }
-            )
+
+            activity.player = ExoPlayer.Builder(LocalContext.current).build()
+
+            val musicUri =
+                activity.intent.getStringExtra("path")!!.split("/").toMutableList().dropLast(1)
+                    .toMutableList()
+            musicUri.add(music.soundTrack!!)
+
+            activity.player?.setMediaItem(MediaItem.fromUri(API_BASE_URL + musicUri.joinToString("/")))
+            activity.player?.prepare()
+            activity.player?.play()
+            Column {
+                KaraokeTextAnimate(
+                    music.lyrics.map { it.duration.inWholeMilliseconds.toInt() },
+                    music.lyrics.map { it.text }
+                )
+                PlayerView(LocalContext.current).apply {
+                    player = ExoPlayer.Builder(LocalContext.current).build()
+                    player?.setMediaItem(MediaItem.fromUri(music.soundTrack!!))
+                    player?.prepare()
+                    player?.play()
+                }
+            }
         }
+
         is MusicDetailsState.Loading -> {
             CircularProgressIndicator()
         }
+
         is MusicDetailsState.Error -> {
             Text("Error: ${state.message}")
         }

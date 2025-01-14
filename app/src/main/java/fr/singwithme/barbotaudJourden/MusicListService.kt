@@ -8,16 +8,16 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Url
 
-private const val MUSIC_LIST_URL = "https://gcpa-enssat-24-25.s3.eu-west-3.amazonaws.com/"
+const val API_BASE_URL = "https://gcpa-enssat-24-25.s3.eu-west-3.amazonaws.com/"
 
 private val retrofitJson = Retrofit.Builder()
     .addConverterFactory(GsonConverterFactory.create())
-    .baseUrl(MUSIC_LIST_URL)
+    .baseUrl(API_BASE_URL)
     .build()
 
 private val retrofitMd = Retrofit.Builder()
     .addConverterFactory(MdConverterFactory())
-    .baseUrl(MUSIC_LIST_URL)
+    .baseUrl(API_BASE_URL)
     .build()
 
 interface MusicListService{
