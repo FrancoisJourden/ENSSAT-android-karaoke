@@ -96,7 +96,6 @@ fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
 fun Body(modifier: Modifier = Modifier, path: String){
     var musicDetailsState by remember { mutableStateOf<MusicDetailsState>(MusicDetailsState.Loading) }
     val activity = LocalContext.current as RenderMusicActivity
-
     LaunchedEffect(Unit) {
         activity.getMusic(path) {
             musicDetailsState = it
@@ -126,9 +125,8 @@ fun KaraokeSimpleText(text: String, progress: Float) {
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
     var redTextWidth by remember { mutableIntStateOf(0) }
-    var fontSize by remember { mutableStateOf(50f.sp) }
-    var hasFittingSize by remember { mutableStateOf(false) }
-    var hasFittingSize2 by remember { mutableStateOf(false) }
+    val font = 50f.sp
+    var fontSize by remember { mutableStateOf(font) }
 
     Box(
         Modifier
@@ -146,11 +144,7 @@ fun KaraokeSimpleText(text: String, progress: Float) {
             style = TextStyle(fontSize = fontSize),
             onTextLayout = { textLayoutResult ->
                 if (textLayoutResult.hasVisualOverflow) {
-                    Log.d("testuwu", "1")
-                    Log.d("testuwu", fontSize.toString())
                     fontSize = (fontSize.value * 0.9).sp
-                } else {
-                    Log.d("testuwu", "sizeOK1")
                 }
             },
 
@@ -183,10 +177,10 @@ fun KaraokeTextAnimate(duration: List<Int>, list: List<String>) {
     LaunchedEffect(Unit) {
         while (counter < listSize - 1) {
             //delay(duration.toLong())
-            counter++
             //Reset all animation
             karaokeAnimation.snapTo(0f)
             karaokeAnimation.animateTo(1f, tween(duration[counter], easing = LinearEasing))
+            counter++
         }
     }
     KaraokeText(list, counter, karaokeAnimation.value)
