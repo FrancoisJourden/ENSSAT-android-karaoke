@@ -1,6 +1,7 @@
 package fr.singwithme.barbotaudJourden
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -10,6 +11,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -31,6 +33,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -123,6 +126,10 @@ fun KaraokeSimpleText(text: String, progress: Float) {
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
     var redTextWidth by remember { mutableIntStateOf(0) }
+    var fontSize by remember { mutableStateOf(50f.sp) }
+    var hasFittingSize by remember { mutableStateOf(false) }
+    var hasFittingSize2 by remember { mutableStateOf(false) }
+
     Box(
         Modifier
             .onGloballyPositioned { coordinates ->
@@ -130,19 +137,31 @@ fun KaraokeSimpleText(text: String, progress: Float) {
                 redTextWidth = coordinates.size.width
             }
             .height(screenHeight)
+            .fillMaxWidth()
             .padding(20.dp),
         contentAlignment = Alignment.CenterStart
     ) {
         Text(
             text,
-            fontSize = 20.sp,
+            style = TextStyle(fontSize = fontSize),
+            onTextLayout = { textLayoutResult ->
+                if (textLayoutResult.hasVisualOverflow) {
+                    Log.d("testuwu", "1")
+                    Log.d("testuwu", fontSize.toString())
+                    fontSize = (fontSize.value * 0.9).sp
+                } else {
+                    Log.d("testuwu", "sizeOK1")
+                }
+            },
+
+            softWrap = false,
         );
         Text(
             text,
             modifier = Modifier.width(redTextWidth.pxToDp() * progress),
             softWrap = false,
-            fontSize = 20.sp,
-            color = Color.Red
+            style = TextStyle(fontSize = fontSize),
+            color = Color.Red,
         );
     }
 }
