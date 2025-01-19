@@ -3,6 +3,9 @@
 ## Introduction
 Ce document fournit un aperçu de l'architecture et des choix de conception réalisés pour l'application `fr.singwithme.BarbotaudJourden`. L'application est construite en utilisant Kotlin et Java, avec Gradle comme système de build. Elle utilise plusieurs bibliothèques et frameworks modernes pour garantir une base de code robuste et maintenable.
 
+## APK
+L'APK se trouve dans le répertoire `app/build/outputs/apk/debug/app-debug.apk`.
+
 ## Structure du projet
 Le projet est organisé dans les principaux répertoires suivants :
 - `src/main/java/fr/singwithme/barbotaudJourden` : Contient le code principal de l'application.
