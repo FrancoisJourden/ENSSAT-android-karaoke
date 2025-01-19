@@ -1,4 +1,4 @@
-package fr.singwithme.BarbotaudJourden
+package fr.singwithme.barbotaudJourden
 
 import org.junit.Test
 

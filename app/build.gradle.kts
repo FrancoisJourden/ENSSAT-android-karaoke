@@ -66,4 +66,7 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer:1.4.1")
     implementation("androidx.media3:media3-ui:1.4.1") // Optional, for built-in UI
 
+
+    testImplementation("org.mockito:mockito-core:5.0.0")
+    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
 }
